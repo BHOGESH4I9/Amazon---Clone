@@ -1,4 +1,8 @@
-import { cart, removeProductFromCart, updateDeliveryOption } from "../data/cart.js";
+import {
+  cart,
+  removeProductFromCart,
+  updateDeliveryOption,
+} from "../data/cart.js";
 import { products } from "../data/products.js";
 import formatCurreny from "./utils/money.js";
 import dayjs from "https://unpkg.com/supersimpledev@8.5.0/dayjs/esm/index.js";
@@ -35,7 +39,9 @@ function renderCart() {
             </div>
             <div class="product-quantity">
               <span>
-                Quantity: <span class="quantity-label">${cartItem.quantity}</span>
+                Quantity: <span class="quantity-label">${
+                  cartItem.quantity
+                }</span>
               </span>
               <span class="update-quantity-link link-primary">
                 Update
@@ -51,7 +57,7 @@ function renderCart() {
             <div class="delivery-options-title">
               Choose a delivery option:
             </div>
-            ${deliveryOptionsHTML(matchingProduct)}
+            ${deliveryOptionsHTML(cartItem)}
           </div>
         </div>
       </div>
@@ -68,58 +74,69 @@ function renderCart() {
     });
   });
 
-  document.querySelectorAll('.js-delivery-option').forEach((element) => {
-  element.addEventListener('click', () => {
-    const productID = element.dataset.productId.trim();
-    const deliveryOptionId = element.dataset.deliveryOptionId.trim();
+  document.querySelectorAll(".delivery-option-input").forEach((input) => {
+  input.addEventListener("change", () => {
+    const parent = input.closest(".js-delivery-option");
+    const productID = parent.dataset.productId.trim();
+    const deliveryOptionId = parent.dataset.deliveryOptionId.trim();
 
     updateDeliveryOption(productID, deliveryOptionId);
-    renderCart(); // rerender cart to reflect updated delivery date
+
+    // ✅ Add a small delay so radio UI shows before re-render
+    setTimeout(() => {
+      renderCart();
+    }, 50);
   });
 });
 }
 
-function deliveryOptionsHTML(matchingProduct) {
-  let html = '';
+function deliveryOptionsHTML(cartItem) {
+  const matchingProduct = products.find(p => p.id === cartItem.productId);
+  let html = "";
 
   deliveryOptions.forEach((deliveryOption) => {
     const today = dayjs();
-    const deliveryDate = today.add(deliveryOption.deliveryDays, 'day');
-    const dateString = deliveryDate.format('dddd, MMMM D');
+    const deliveryDate = today.add(deliveryOption.deliveryDays, "day");
+    const dateString = deliveryDate.format("dddd, MMMM D");
 
-    const priceString = deliveryOption.priceCents === 0
-      ? 'Free'
-      : `$${formatCurreny(deliveryOption.priceCents)} - `;
+    const priceString =
+      deliveryOption.priceCents === 0
+        ? "Free"
+        : `$${formatCurreny(deliveryOption.priceCents)} - `;
 
-    const isChecked = deliveryOption.id === matchingProduct.deliveryOptionsId ? 'checked' : '';
+    const isChecked =
+      deliveryOption.id === cartItem.deliveryOptionsId ? "checked" : "";
 
     html += `
-      <div class="delivery-option js-delivery-option"
-        data-product-id="${matchingProduct.id}"
-        data-delivery-option-id="${deliveryOption.id}">
+  <label class="delivery-option js-delivery-option"
+    data-product-id="${matchingProduct.id}"
+    data-delivery-option-id="${deliveryOption.id}">
 
-        <input type="radio" ${isChecked}
-               class="delivery-option-input"
-               name="delivery-option-${matchingProduct.id}">
-        <div>
-          <div class="delivery-option-date">
-            ${dateString}
-          </div>
-          <div class="delivery-option-price">
-            ${priceString} Shipping
-          </div>
-        </div>
+    <input type="radio" ${isChecked}
+           class="delivery-option-input"
+           name="delivery-option-${matchingProduct.id}">
+    <div>
+      <div class="delivery-option-date">
+        ${dateString}
       </div>
-    `;
+      <div class="delivery-option-price">
+        ${priceString} Shipping
+      </div>
+    </div>
+  </label>
+`;
   });
 
   return html;
 }
 
+
 function getDeliveryDate(cartItem) {
-  const deliveryOption = deliveryOptions.find(option => option.id === cartItem.deliveryOptionsId);
-  const date = dayjs().add(deliveryOption?.deliveryDays || 7, 'day');
-  return date.format('dddd, MMMM D');
+  const deliveryOption = deliveryOptions.find(
+    (option) => option.id === cartItem.deliveryOptionsId
+  );
+  const date = dayjs().add(deliveryOption?.deliveryDays || 7, "day");
+  return date.format("dddd, MMMM D");
 }
 
 renderCart();

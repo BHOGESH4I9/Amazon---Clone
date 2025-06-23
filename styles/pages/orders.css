@@ -56,6 +56,17 @@
   flex-shrink: 1;
 }
 
+.delivery-option-input {
+    appearance: auto;
+    -webkit-appearance: radio;
+    -moz-appearance: radio;
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
 @media (max-width: 575px) {
   .order-header {
     flex-direction: column;
