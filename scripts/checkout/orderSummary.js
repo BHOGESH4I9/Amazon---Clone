@@ -2,24 +2,19 @@ import { cart,
   removeProductFromCart,
   updateDeliveryOption,} from '../../data/cart.js'
 
-import { products } from '../../data/products.js';
-import formatCurreny from '../utils/money.js';
+import { products, getProduct } from '../../data/products.js';
+import formatCurreny from "../utils/money.js";
 import dayjs from "https://unpkg.com/supersimpledev@8.5.0/dayjs/esm/index.js";
-import { deliveryOptions } from '../../data/deliveryOptions.js'; 
+import { deliveryOptions, getDeliveryOptionsId } from "../../data/deliveryOptions.js";
 
 export function renderCart() {
   let cartProductsHtml = "";
 
   cart.forEach((cartItem) => {
     const productId = cartItem.productId;
-    let matchingProduct;
+    const matchingProduct = getProduct(productId);
 
-    products.forEach((product) => {
-      if (product.id === productId) {
-        matchingProduct = product;
-      }
-    });
-
+    
     cartProductsHtml += `
       <div class="cart-item-container">
         <div class="delivery-date">
@@ -103,8 +98,8 @@ function deliveryOptionsHTML(cartItem) {
         ? "Free"
         : `$${formatCurreny(deliveryOption.priceCents)} - `;
 
-    const isChecked =
-      deliveryOption.id === cartItem.deliveryOptionsId ? "checked" : "";
+    const selectedOptionId = getDeliveryOptionsId(cartItem.productId);
+    const isChecked = deliveryOption.id === selectedOptionId ? "checked" : "";
 
     html += `
   <label class="delivery-option js-delivery-option"
