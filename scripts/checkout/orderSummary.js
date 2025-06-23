@@ -6,6 +6,8 @@ import { products, getProduct } from '../../data/products.js';
 import formatCurreny from "../utils/money.js";
 import dayjs from "https://unpkg.com/supersimpledev@8.5.0/dayjs/esm/index.js";
 import { deliveryOptions, getDeliveryOptionsId } from "../../data/deliveryOptions.js";
+import renderPaymentSummary from './paymentSummary.js';
+
 
 export function renderCart() {
   let cartProductsHtml = "";
@@ -65,23 +67,24 @@ export function renderCart() {
       const productID = link.dataset.productId.trim();
       removeProductFromCart(productID);
       renderCart();
+      renderPaymentSummary();
     });
   });
 
   document.querySelectorAll(".delivery-option-input").forEach((input) => {
-  input.addEventListener("change", () => {
-    const parent = input.closest(".js-delivery-option");
-    const productID = parent.dataset.productId.trim();
-    const deliveryOptionId = parent.dataset.deliveryOptionId.trim();
+    input.addEventListener("change", () => {
+      const parent = input.closest(".js-delivery-option");
+      const productID = parent.dataset.productId.trim();
+      const deliveryOptionId = parent.dataset.deliveryOptionId.trim();
 
-    updateDeliveryOption(productID, deliveryOptionId);
+      updateDeliveryOption(productID, deliveryOptionId);
 
-    
-    setTimeout(() => {
-      renderCart();
-    }, 50);
+      setTimeout(() => {
+        renderCart();
+        renderPaymentSummary();
+      }, 50);
+    });
   });
-});
 }
 
 function deliveryOptionsHTML(cartItem) {

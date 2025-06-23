@@ -67,6 +67,11 @@
     cursor: pointer;
 }
 
+.delivery-option-input {
+  -webkit-appearance: radio;
+  appearance: radio;
+}
+
 @media (max-width: 575px) {
   .order-header {
     flex-direction: column;
