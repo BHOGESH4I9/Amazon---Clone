@@ -1,4 +1,4 @@
-import { cart, removeProductFromCart } from "../data/cart.js";
+import { cart, removeProductFromCart, updateDeliveryOption } from "../data/cart.js";
 import { products } from "../data/products.js";
 import formatCurreny from "./utils/money.js";
 import dayjs from "https://unpkg.com/supersimpledev@8.5.0/dayjs/esm/index.js";
@@ -67,6 +67,16 @@ function renderCart() {
       renderCart();
     });
   });
+
+  document.querySelectorAll('.js-delivery-option').forEach((element) => {
+  element.addEventListener('click', () => {
+    const productID = element.dataset.productId.trim();
+    const deliveryOptionId = element.dataset.deliveryOptionId.trim();
+
+    updateDeliveryOption(productID, deliveryOptionId);
+    renderCart(); // rerender cart to reflect updated delivery date
+  });
+});
 }
 
 function deliveryOptionsHTML(matchingProduct) {
@@ -81,9 +91,14 @@ function deliveryOptionsHTML(matchingProduct) {
       ? 'Free'
       : `$${formatCurreny(deliveryOption.priceCents)} - `;
 
+    const isChecked = deliveryOption.id === matchingProduct.deliveryOptionsId ? 'checked' : '';
+
     html += `
-      <div class="delivery-option">
-        <input type="radio" checked
+      <div class="delivery-option js-delivery-option"
+        data-product-id="${matchingProduct.id}"
+        data-delivery-option-id="${deliveryOption.id}">
+
+        <input type="radio" ${isChecked}
                class="delivery-option-input"
                name="delivery-option-${matchingProduct.id}">
         <div>
@@ -102,7 +117,7 @@ function deliveryOptionsHTML(matchingProduct) {
 }
 
 function getDeliveryDate(cartItem) {
-  const deliveryOption = deliveryOptions.find(option => option.id === cartItem.deliveryOptionId || option.id === cartItem.deliveryOptions);
+  const deliveryOption = deliveryOptions.find(option => option.id === cartItem.deliveryOptionsId);
   const date = dayjs().add(deliveryOption?.deliveryDays || 7, 'day');
   return date.format('dddd, MMMM D');
 }

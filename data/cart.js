@@ -45,3 +45,12 @@ export function removeProductFromCart(productId) {
 
   saveToLocalstorage();
 }
+
+export function updateDeliveryOption(productId, deliveryOptionsId) {
+  const matchingItem = cart.find(item => item.productId === productId);
+
+  if (matchingItem) {
+    matchingItem.deliveryOptionsId = deliveryOptionsId;
+    saveToLocalstorage();
+  }
+}
